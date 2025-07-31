@@ -1,0 +1,40 @@
+#
+# note reference to PCRTM_HOME
+# this might be something like /data/RT_tools/PCRTM/PREFIRE_PCRTM_V3.4
+#
+FC=ifort
+PCRTMLIB = ${PCRTM_HOME}/lib
+PCRTMINC = ${PCRTM_HOME}/include
+
+PCRTMSOLARLIB = ${PCRTM_SOLAR_HOME}/lib
+PCRTMSOLARINC = ${PCRTM_SOLAR_HOME}/include
+
+PCRTM_wrapper_module.so: PCRTM_wrapper_module.o
+	${FC} PCRTM_wrapper_module.o ${PCRTM_HOME}/lib/libPCRTM.a \
+		-shared -I${PCRTMINC} -L${PCRTMLIB} \
+		-o PCRTM_wrapper_module.so
+
+PCRTM_wrapper_module.o: PCRTM_wrapper_module.f90
+	${FC} -fPIC -c PCRTM_wrapper_module.f90 -o PCRTM_wrapper_module.o \
+		-I${PCRTMINC} -L${PCRTMLIB}
+
+PCRTM_SOLAR_wrapper_module.so: PCRTM_SOLAR_wrapper_module.o
+	${FC} PCRTM_SOLAR_wrapper_module.o ${PCRTM_SOLAR_HOME}/lib/libPCRTM.a \
+		-shared -I${PCRTMSOLARINC} -L${PCRTMSOLARLIB} \
+		-o PCRTM_SOLAR_wrapper_module.so
+
+PCRTM_SOLAR_wrapper_module.o: PCRTM_SOLAR_wrapper_module.f90
+	${FC} -fPIC -c PCRTM_SOLAR_wrapper_module.f90 -o PCRTM_SOLAR_wrapper_module.o \
+		-I${PCRTMSOLARINC} -L${PCRTMSOLARLIB}
+
+PCRTM_wrapper : PCRTM_wrapper_module.so
+
+PCRTM_SOLAR_wrapper : PCRTM_SOLAR_wrapper_module.so
+
+all: PCRTM_wrapper_module.so PCRTM_SOLAR_wrapper_module.so
+
+clean:
+	rm -f PCRTM_wrapper_module.o PCRTM_wrapper_module.so \
+		pcrtm_wrapper_module.mod \
+		PCRTM_SOLAR_wrapper_module.o PCRTM_SOLAR_wrapper_module.so \
+		pcrtm_solar_wrapper_module.mod

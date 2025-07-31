@@ -1,0 +1,67 @@
+#
+# note reference to PCRTM_HOME
+# this might be something like /data/RT_tools/PCRTM/PREFIRE_PCRTM_V3.4
+#
+FC=gfortran
+PCRTMLIB = ${PCRTM_HOME}/lib
+PCRTMINC = ${PCRTM_HOME}/include
+
+PCRTMSOLARLIB = ${PCRTM_SOLAR_HOME}/lib
+PCRTMSOLARINC = ${PCRTM_SOLAR_HOME}/include
+
+  # Note that the options after '-Wall' and before '-shared' are very
+  #  system-dependent (in this case they are a common set that can be used for
+  #  both AMD EPYC 9124 and Intel Xeon Silver 4116):
+PCRTM_wrapper_module.so: PCRTM_wrapper_module.o
+	${FC} -fPIC -O3 -ffree-form -fno-second-underscore \
+		-frecord-marker=4 -Wall \
+		-mmmx -msse -msse2 -msse3 -mssse3 -msse4.2 \
+		-mavx -mavx2 -mf16c -mfma -mbmi -mbmi2 \
+		-march='x86-64-v3' \
+		-shared -I${PCRTMINC} -L${PCRTMLIB} \
+		PCRTM_wrapper_module.o ${PCRTM_HOME}/lib/libPCRTM.a \
+		-o PCRTM_wrapper_module.so
+#PCRTM_wrapper_module.so: PCRTM_wrapper_module.o
+#	${FC} -fPIC -Wextra -fbacktrace -g -fcheck=all -ffpe-trap=zero,invalid,overflow -ffree-form -fno-second-underscore \
+#		-frecord-marker=4 -Wall \
+#		-shared -I${PCRTMINC} -L${PCRTMLIB} \
+#		PCRTM_wrapper_module.o ${PCRTM_HOME}/lib/libPCRTM.a \
+#		-o PCRTM_wrapper_module.so
+
+  # Note that the options after '-Wall' and before 'PCRTM_wrapper_module.f90'
+  #  are very system-dependent (in this case they are a common set that can be
+  #  used for both AMD EPYC 9124 and Intel Xeon Silver 4116):
+PCRTM_wrapper_module.o: PCRTM_wrapper_module.f90
+	${FC} -c -fPIC -O3 -ffree-form -fno-second-underscore \
+		-frecord-marker=4 -Wall \
+		-mmmx -msse -msse2 -msse3 -mssse3 -msse4.2 \
+		-mavx -mavx2 -mf16c -mfma -mbmi -mbmi2 \
+		-march='x86-64-v3' \
+		PCRTM_wrapper_module.f90 -o PCRTM_wrapper_module.o \
+		-I${PCRTMINC} -L${PCRTMLIB}
+#PCRTM_wrapper_module.o: PCRTM_wrapper_module.f90
+#	${FC} -c -fPIC -Wextra -fbacktrace -g -fcheck=all -ffpe-trap=zero,invalid,overflow -ffree-form -fno-second-underscore \
+#		-frecord-marker=4 -Wall \
+#		PCRTM_wrapper_module.f90 -o PCRTM_wrapper_module.o \
+#		-I${PCRTMINC} -L${PCRTMLIB}
+
+PCRTM_SOLAR_wrapper_module.so: PCRTM_SOLAR_wrapper_module.o
+	${FC} PCRTM_SOLAR_wrapper_module.o ${PCRTM_SOLAR_HOME}/lib/libPCRTM.a \
+		-shared -I${PCRTMSOLARINC} -L${PCRTMSOLARLIB} \
+		-o PCRTM_SOLAR_wrapper_module.so
+
+PCRTM_SOLAR_wrapper_module.o: PCRTM_SOLAR_wrapper_module.f90
+	${FC} -fPIC -c PCRTM_SOLAR_wrapper_module.f90 -o PCRTM_SOLAR_wrapper_module.o \
+		-I${PCRTMSOLARINC} -L${PCRTMSOLARLIB}
+
+PCRTM_wrapper : PCRTM_wrapper_module.so
+
+PCRTM_SOLAR_wrapper : PCRTM_SOLAR_wrapper_module.so
+
+all: PCRTM_wrapper_module.so
+
+clean:
+	rm -f PCRTM_wrapper_module.o PCRTM_wrapper_module.so \
+		pcrtm_wrapper_module.mod \
+		PCRTM_SOLAR_wrapper_module.o PCRTM_SOLAR_wrapper_module.so \
+		pcrtm_solar_wrapper_module.mod
