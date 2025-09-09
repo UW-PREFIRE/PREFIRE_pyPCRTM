@@ -12,6 +12,8 @@ This code is released under the terms of this [LICENSE](LICENSE).  The version o
 
 This package requires compilation with a modern Fortran compiler. Both the Intel Fortran (ifort) and GNU Fortran (gfortran) compilers have been used and tested.
 
+The associated [PREFIRE_PCRTM_V3.4](https://github.com/UW-PREFIRE/PREFIRE_PCRTM_V3.4) git repository is required for the proper building and operation of this package.
+
 Python version 3.6+ is also required, along with the following third-party Python packages (for the testing step): numpy
 
 ## Python Environment Setup
@@ -30,7 +32,7 @@ conda install -c conda-forge numpy;
 
 ### Preliminary steps and information
 
-First, the PREFIRE_PCRTM_V3.4 package itself needs to be built (see the README.md in that repository). Make a note of the root directory (that contains include/ and lib/) that the built PREFIRE_PCRTM_V3.4 files were installed to, as this will be needed to build the Python wrapper.  For example:
+First, the PREFIRE_PCRTM_V3.4 package itself needs to be built (see [the README.md in that repository](https://github.com/UW-PREFIRE/PREFIRE_PCRTM_V3.4/README.md)). Make a note of the root directory (that contains include/ and lib/) that the built PREFIRE_PCRTM_V3.4 files were installed to, as this will be needed to build the Python wrapper.  For example:
 
 `/data/RT_tools/PCRTM/gfortran_build/PREFIRE_PCRTM_V3.4/`
 
@@ -100,4 +102,4 @@ export PYTHONPATH=/data/RT_tools/PREFIRE_pyPCRTM/gfortran_build;
 
 To use your own build, the PYTHONPATH and/or PCRTM_HOME variables would probably need to be changed. The PCRTM_INPUT_DIR should probably not be duplicated, unless you want to make a copy of that directory structure and all of the (quite large volume of) binary files within.
 
-## _The creation of this code was supported by NASA, as part of the PREFIRE (Polar Radiant Energy in the Far-InfraRed Experiment) CubeSat mission._
+### _The creation of this code was supported by NASA, as part of the PREFIRE (Polar Radiant Energy in the Far-InfraRed Experiment) CubeSat mission._
